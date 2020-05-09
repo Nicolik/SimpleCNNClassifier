@@ -7,8 +7,6 @@
 #   - dog
 # See prepare_dataset.py
 ############################################
-
-
 import os
 import time
 import numpy as np
