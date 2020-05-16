@@ -22,11 +22,18 @@ print("Creating training   dataset from ", train_folder)
 
 train_dataset = torchvision.datasets.ImageFolder(
         root=train_folder,
-        transform=transform_train
+        transform=transform_test
     )
-train_datasampler = subsample_dataset(train_dataset, subsample_portion=.05)
 train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size,
-                                               sampler=train_datasampler, num_workers=num_workers)
+                                               shuffle=False, num_workers=num_workers)
+
+val_dataset = torchvision.datasets.ImageFolder(
+    root=val_folder,
+    transform=transform_test
+)
+val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size,
+                                             shuffle=False, num_workers=num_workers)
+
 classes, classes_dict = get_classes()
 labels_idxs = []
 target_names = []
@@ -47,9 +54,18 @@ if cuda:
 net = net.eval()
 
 #%% Make prediction on train set
-y_true_test, y_pred_test = make_pred_on_dataloader(net, train_dataloader)
+y_true_train, y_pred_train = make_pred_on_dataloader(net, train_dataloader)
 
 #%% Compute metrics on train set
+cf_train = confusion_matrix(y_true_train, y_pred_train, labels=labels_idxs)
+cr_train = classification_report(y_true_train, y_pred_train, target_names=target_names, output_dict=True)
+
+print(classification_report(y_true_train, y_pred_train, target_names=target_names, output_dict=False))
+
+#%% Make prediction on val set
+y_true_test, y_pred_test = make_pred_on_dataloader(net, val_dataloader)
+
+#%% Compute metrics on val set
 cf_test = confusion_matrix(y_true_test, y_pred_test, labels=labels_idxs)
 cr_test = classification_report(y_true_test, y_pred_test, target_names=target_names, output_dict=True)
 

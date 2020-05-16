@@ -47,9 +47,8 @@ print(f"Classes Dict (k: v) = {classes_dict}")
 print(f"Classes Dict (v: k) = {class_dict_inverted}")
 
 #%% Create Train Dataloaders
-train_datasampler = subsample_dataset(train_dataset, subsample_portion=.05)
 train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size,
-                                               sampler=train_datasampler, num_workers=num_workers)
+                                               shuffle=True, num_workers=num_workers)
 
 #%% Iterable on dataloader
 dataiter = iter(train_dataloader)

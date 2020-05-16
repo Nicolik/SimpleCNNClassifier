@@ -9,9 +9,9 @@ import torchvision.transforms as transforms
 import os
 
 # Root dataset folder
-dataset_folder = 'dataset'
+dataset_folder = 'dataset_reduced'
 train_folder = os.path.join(dataset_folder, "train")
-test_folder = os.path.join(dataset_folder, "test")
+val_folder = os.path.join(dataset_folder, "val")
 
 # Set to 0 on Windows
 num_workers = 0
