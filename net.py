@@ -9,6 +9,81 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+# 2D Image
+# B x C x H x W
+# B x 3 x 224 x 224
+
+class NetExample(nn.Module):
+    def __init__(self, in_channels=3, out_classes=2):
+        super(NetExample, self).__init__()
+
+        ##################################
+        # ENCODER PART OF THE NETWORK
+        # B x 3 x 224 x 224
+        # Number of kernels: K
+        # Size of kernel:    k x k
+        # Stride:            1 x 1
+        # Padding:           SAME
+        self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels=4, kernel_size=(5,5), padding=2)
+        # How many parameters are in conv1 layer?
+        # 5 x 5 x 3 x 4 = 300
+        # B x 4 x 224 x 224
+        self.pool1 = nn.MaxPool2d(2,2)
+        # B x 4 x 112 x 112
+        self.conv2 = nn.Conv2d(in_channels=4, out_channels=8, kernel_size=(5,5), padding=2)
+        # 5 x 5 x 4 x 8 = 3200
+        # B x 8 x 112 x 112
+        self.pool2 = nn.MaxPool2d(2,2)
+        # B x 8 x 56 x 56
+        self.conv3 = nn.Conv2d(in_channels=8, out_channels=8, kernel_size=(5,5), padding=2)
+        # 5 x 5 x 8 x 8 = 6400
+        # B x 8 x 56 x 56
+        self.pool3 = nn.MaxPool2d(2,2)
+        # B x 8 x 28 x 28
+        # TOTAL N. OF PARAMETERS: 9900
+        ###################################
+
+        ###################################
+        # CLASSIFIER PART OF THE NETWORK
+        # 8 x 28 x 28 = 6272 Input
+        # Flatten [1,...,6272]
+        # Parameters ? 313600
+        # 50 Output
+        # B x 6272
+        self.hidden = nn.Linear(in_features=8 * 28 * 28, out_features=50)
+        # B x 50
+        self.final = nn.Linear(in_features=50, out_features=out_classes)
+        # B x 2
+        ###################################
+
+    def forward(self, x):
+        ##################################
+        # ENCODER PART
+        # First Convolutional Block
+        x = self.conv1(x)
+        x = F.relu(x)
+        x = self.pool1(x)
+
+        # Second Convolutional Block
+        x = self.conv2(x)
+        x = F.relu(x)
+        x = self.pool2(x)
+
+        # Third Convolutional Block
+        x = self.conv3(x)
+        x = F.relu(x)
+        x = self.pool3(x)
+        ##################################
+
+        ##################################
+        # CLASSIFIER PART
+        x = x.view(-1, 8 * 28 * 28)
+        x = self.hidden(x)
+        x = F.relu(x)
+        x = self.final(x)
+        ##################################
+
+        return x
 
 class Net(nn.Module):
     def __init__(self, in_channels=3, out_features=2):
@@ -82,11 +157,24 @@ if do_test:
     image_size = 224
     num_classes = 2
 
+    # Input Shape
+    # B x C x H x W
     shape_in = (batch_size, num_channels, image_size, image_size)
+
+    # Output Shape
+    # B x K
     shape_out_cnn = (batch_size, num_classes)
+
+    # Ground Truth shape
     shape_out_gt = (batch_size,)
-    net = Net()
+
+    # net = Net()
+    net = NetExample()
+
+    # B x C x H x W
     example_in = torch.rand(shape_in)
+
+    # B x K
     example_out = net(example_in)
 
     print("Out Shape CNN = ", shape_out_cnn)

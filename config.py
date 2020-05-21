@@ -25,6 +25,9 @@ batch_size  = 32
 NUM_CLASSES = 2
 CHANNELS    = 3
 
+# X
+# Z = (X - mu(X)) / std(X)
+
 # Normalization
 mean_norm = (0.485, 0.456, 0.406)
 std_norm  = (0.229, 0.224, 0.225)

@@ -21,7 +21,7 @@ from torch.utils.data import SubsetRandomSampler
 from PIL import Image, ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-from net import Net
+from net import Net, NetExample
 from utils import imshow, subsample_dataset
 from config import *
 
@@ -64,7 +64,8 @@ imshow(image_, mean=mean_norm, std=std_norm)
 print(f'Label: {label_}')
 
 #%% Instantiate a network
-net = Net(in_channels=CHANNELS, out_features=NUM_CLASSES)
+# net = Net(in_channels=CHANNELS, out_features=NUM_CLASSES)
+net = NetExample(in_channels=CHANNELS, out_classes=NUM_CLASSES)
 
 # Move the network on CUDA
 if cuda:
@@ -79,6 +80,7 @@ for epoch in range(epochs):  # loop over the dataset multiple times
 
     start_time = time.time()
     running_loss = 0.0
+
     for i, data in enumerate(train_dataloader, 0):
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data
